@@ -3,9 +3,6 @@ const { assert } = require('chai');
 const _ = require('lodash');
 
 const MintableErc20Token = contract.fromArtifact('ERC20Mintable');
-// const NewTokenSaleRegistryVer = contract.fromArtifact('NewTokenSaleRegistryVer');
-// const NewWhitelistedTokenSaleVer = contract.fromArtifact('NewWhitelistedTokenSaleVer');
-// const BaseAdminUpgradeabilityProxy = contract.fromArtifact('BaseAdminUpgradeabilityProxy');
 
 const { ether, assertRevert } = require('@galtproject/solidity-test-chest')(web3);
 

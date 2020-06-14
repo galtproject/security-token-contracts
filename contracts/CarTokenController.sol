@@ -59,6 +59,12 @@ contract CarTokenController is Managed {
     _setMemberAddress(_memberKey, _newAddr);
   }
 
+  function changeMemberAddressAndMigrateBalance(bytes32 _memberKey, address _newAddr) public onlyAdmin {
+    address oldAddress = members[_memberKey].addr;
+    changeMemberAddress(_memberKey, _newAddr);
+    migrateBalance(oldAddress, _newAddr);
+  }
+
   function mintTokens(address _addr, uint256 _amount) public onlyAdmin {
     token.mint(_addr, _amount);
   }
