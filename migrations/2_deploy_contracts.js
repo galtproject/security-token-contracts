@@ -19,7 +19,10 @@ module.exports = function(deployer, network, accounts) {
     await testStableToken1.mint(accounts[0], web3Utils.toWei((10 ** 6).toString(), 'ether'));
     await testStableToken2.mint(accounts[0], web3Utils.toWei((10 ** 6).toString(), 'ether'));
 
-    const { tokenController, tokenReserve, token: mainToken } = await deployWhitelistedTokenSale(accounts[0], proxyAdmin);
+    const { tokenController, tokenReserve, token: mainToken } = await deployWhitelistedTokenSale(
+      accounts[0],
+      proxyAdmin
+    );
 
     console.log('tokenReserve.addAdmin');
 
@@ -53,7 +56,10 @@ module.exports = function(deployer, network, accounts) {
     await testStableToken1.approve(tokenReserve.address, web3Utils.toWei((10 ** 2).toString(), 'ether'));
 
     console.log('tokenReserve.getTokenAmount');
-    const tokenAmount = await tokenReserve.getTokenAmount(testStableToken1.address, web3Utils.toWei((10 ** 2).toString(), 'ether'));
+    const tokenAmount = await tokenReserve.getTokenAmount(
+      testStableToken1.address,
+      web3Utils.toWei((10 ** 2).toString(), 'ether')
+    );
 
     console.log('testStableToken1.transfer');
     await testStableToken1.transfer(tokenReserve.address, web3Utils.toWei((10 ** 2).toString(), 'ether'));
@@ -61,8 +67,12 @@ module.exports = function(deployer, network, accounts) {
     console.log('tokenAmount', tokenAmount);
     await tokenReserve.contract.methods
       .reserveTokens(testStableToken1.address, accounts[0], web3Utils.toWei((10 ** 2).toString(), 'ether'))
-      .estimateGas({from: accounts[0]});
-    await tokenReserve.reserveTokens(testStableToken1.address, accounts[0], web3Utils.toWei((10 ** 2).toString(), 'ether'));
+      .estimateGas({ from: accounts[0] });
+    await tokenReserve.reserveTokens(
+      testStableToken1.address,
+      accounts[0],
+      web3Utils.toWei((10 ** 2).toString(), 'ether')
+    );
 
     const contractsData = {
       mainTokenAddress: mainToken.address,
