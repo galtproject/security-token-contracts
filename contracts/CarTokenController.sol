@@ -9,39 +9,76 @@
 
 pragma solidity ^0.5.13;
 
-import "@galtproject/whitelisted-tokensale/contracts/ERC20Token.sol";
-import "@galtproject/whitelisted-tokensale/contracts/interfaces/ITokenSaleRegistry.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol";
+import "@galtproject/whitelisted-tokensale/contracts/traits/Managed.sol";
+import "./interfaces/ICarToken.sol";
 
 
-contract CarToken is ERC20Token, Ownable {
-  ITokenSaleRegistry public tokenSaleRegistry;
+contract CarTokenController is Managed {
 
-  constructor (address _tokenSaleRegistry) public ERC20Token("CarToken1", "CT1", 0) {
-    tokenSaleRegistry = ITokenSaleRegistry(_tokenSaleRegistry);
+  ICarToken token;
+
+  struct Member {
+    address addr;
+    bool active;
   }
 
-  function checkTransfer(address from, address to, uint256 amount) public view returns(bool, string) {
-    if (from == address(0)) {
-      return (false, "ERC20: transfer from the zero address");
-    }
-    if (to == address(0)) {
-      return (false, "ERC20: transfer to the zero address");
-    }
-    if (balances[from] < amount) {
-      return (false, "ERC20: transfer amount exceeds balance");
-    }
-    return (true, "");
+  mapping(bytes32 => Member) public members;
+  mapping(address => bytes32) public keyOfMember;
+
+  constructor () public {}
+
+  function initialize(address _owner) public initializer {
+    Ownable.initialize(_owner);
   }
 
-  function checkTransferFrom(address sender, address from, address to, uint256 amount) public view returns(bool, string) {
-    (bool success, string memory error) = checkTransfer(from, to, amount);
-    if (!success) {
-      return (success, error);
-    }
-    if (_allowances[from][sender] < amount) {
-      return (false, "ERC20: transfer amount exceeds allowance");
-    }
-    return (true, "");
+  function setToken(ICarToken _token) public onlyOwner {
+    token = _token;
+  }
+
+  function addNewMember(bytes32 _key, address _addr) public onlyAdminOrManager {
+    _setMemberAddress(_key, _addr);
+  }
+
+  function setMemberActive(bytes32 _key, bool _active) public onlyAdminOrManager {
+    require(members[_key].addr != address(0), "Member does not exists");
+    members[_key].active = _active;
+  }
+
+  function migrateBalance(address _from, address _to) public onlyAdmin {
+    require(isMemberAddressActive(_to), "Recipient member does not active");
+
+    uint256 fromBalance = token.balanceOf(_from);
+    token.burn(_from, fromBalance);
+    token.mint(_to, fromBalance);
+  }
+
+  function changeMemberAddress(bytes32 _memberKey, address _newAddr) public onlyAdmin {
+    keyOfMember[members[_memberKey].addr] = bytes32(0);
+    members[_memberKey] = Member(address(0), false);
+
+    _setMemberAddress(_memberKey, _newAddr);
+  }
+
+  function mintTokens(address _addr, uint256 _amount) public onlyAdmin {
+    token.mint(_addr, _amount);
+  }
+
+  function isMemberAddressActive(address _addr) public view returns (bool) {
+    return members[keyOfMember[_addr]].active;
+  }
+
+  function requireMembersAreActive(address _member1, address _member2) public view {
+    require(
+      isMemberAddressActive(_member1) && isMemberAddressActive(_member2),
+      "The address has no Car token transfer permission"
+    );
+  }
+
+  function _setMemberAddress(bytes32 _key, address _addr) internal {
+    require(members[_key].addr == address(0), "Member already exists");
+    require(keyOfMember[_addr] == bytes32(0), "Address already claimed");
+
+    members[_key] = Member(_addr, true);
+    keyOfMember[_addr] = _key;
   }
 }

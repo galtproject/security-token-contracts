@@ -10,6 +10,10 @@
 pragma solidity ^0.5.13;
 
 
-interface ICarTokenController {
-  function requireMembersAreValid(address _member1, address _member2);
+interface ICarToken {
+  function balanceOf(address account) external view returns (uint256);
+
+  function mint(address account, uint256 amount) external;
+
+  function burn(address account, uint256 amount) external;
 }
