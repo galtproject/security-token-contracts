@@ -40,7 +40,7 @@ describe('TokenReserve', () => {
     await this.tokenReserve.addAdmin(owner, { from: owner });
     await this.tokenController.addAdmin(owner, { from: owner });
 
-    await this.tokenController.addNewMember(reserveKey, this.tokenReserve.address, { from: owner });
+    await this.tokenController.addNewInvestors([reserveKey], [this.tokenReserve.address], { from: owner });
 
     await this.tokenController.setToken(this.mainToken.address, { from: owner });
 
@@ -103,17 +103,17 @@ describe('TokenReserve', () => {
     it('should add and remove admins correctly', async function() {
       assert.equal(await this.tokenController.isAdmin(dan), false);
       assert.equal(await this.tokenController.isManager(dan), false);
-      assert.equal(await this.tokenController.isMemberAddressActive(bob), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), false);
 
       await assertRevert(
-        this.tokenController.addNewMember(bobKey, bob, { from: dan }),
+        this.tokenController.addNewInvestors([bobKey], [bob], { from: dan }),
         'Managered: Msg sender is not admin or manager'
       );
 
-      await this.tokenController.addNewMember(bobKey, bob, { from: owner });
+      await this.tokenController.addNewInvestors([bobKey], [bob], { from: owner });
 
       await assertRevert(
-        this.tokenController.setMemberActive(bobKey, true, { from: dan }),
+        this.tokenController.setInvestorActive(bobKey, true, { from: dan }),
         'Managered: Msg sender is not admin or manager'
       );
 
@@ -123,7 +123,7 @@ describe('TokenReserve', () => {
       );
 
       await assertRevert(
-        this.tokenController.changeMemberAddress(bobKey, alice, { from: dan }),
+        this.tokenController.changeInvestorAddress(bobKey, alice, { from: dan }),
         'Administrated: Msg sender is not admin'
       );
 
@@ -139,11 +139,11 @@ describe('TokenReserve', () => {
 
       assert.equal(await this.tokenController.isAdmin(dan), true);
 
-      assert.equal(await this.tokenController.isMemberAddressActive(bob), true);
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), true);
 
-      await this.tokenController.setMemberActive(bobKey, false, { from: dan });
+      await this.tokenController.setInvestorActive(bobKey, false, { from: dan });
 
-      assert.equal(await this.tokenController.isMemberAddressActive(bob), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), false);
 
       assert.equal(await this.tokenController.isManager(alice), false);
       await this.tokenController.addManager(alice, { from: dan });
@@ -152,10 +152,10 @@ describe('TokenReserve', () => {
 
     it('should add and remove managers correctly', async function() {
       assert.equal(await this.tokenController.isManager(dan), false);
-      assert.equal(await this.tokenController.isMemberAddressActive(bob), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), false);
 
       await assertRevert(
-        this.tokenController.addNewMember(bobKey, bob, { from: dan }),
+        this.tokenController.addNewInvestors([bobKey], [bob], { from: dan }),
         'Managered: Msg sender is not admin or manager'
       );
 
@@ -163,9 +163,9 @@ describe('TokenReserve', () => {
 
       assert.equal(await this.tokenController.isManager(dan), true);
 
-      await this.tokenController.addNewMember(bobKey, bob, { from: dan });
+      await this.tokenController.addNewInvestors([bobKey], [bob], { from: dan });
 
-      assert.equal(await this.tokenController.isMemberAddressActive(bob), true);
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), true);
     });
   });
 
@@ -174,7 +174,7 @@ describe('TokenReserve', () => {
       await this.tokenController.addAdmin(dan, { from: owner });
       await this.tokenReserve.addAdmin(dan, { from: owner });
 
-      await this.tokenController.addNewMember(bobKey, bob, { from: dan });
+      await this.tokenController.addNewInvestors([bobKey], [bob], { from: dan });
 
       await this.daiToken.approve(this.tokenReserve.address, ether(42), { from: bob });
 
@@ -233,7 +233,7 @@ describe('TokenReserve', () => {
     });
 
     it('should successfully reserveTokens with rate 1/2', async function() {
-      await this.tokenController.addNewMember(bobKey, bob, { from: owner });
+      await this.tokenController.addNewInvestors([bobKey], [bob], { from: owner });
 
       await this.tusdToken.approve(this.tokenReserve.address, ether(42), { from: bob });
 
@@ -281,7 +281,7 @@ describe('TokenReserve', () => {
     });
 
     it('should successfully reserveTokens with rate 2/1', async function() {
-      await this.tokenController.addNewMember(bobKey, bob, { from: owner });
+      await this.tokenController.addNewInvestors([bobKey], [bob], { from: owner });
 
       await this.xchfToken.approve(this.tokenReserve.address, ether(42), { from: bob });
 
@@ -322,7 +322,7 @@ describe('TokenReserve', () => {
 
       await this.tokenReserve.pause({ from: owner });
 
-      await this.tokenController.addNewMember(bobKey, bob, { from: owner });
+      await this.tokenController.addNewInvestors([bobKey], [bob], { from: owner });
 
       await this.daiToken.approve(this.tokenReserve.address, ether(42), { from: bob });
 
@@ -346,7 +346,7 @@ describe('TokenReserve', () => {
       );
 
       await assertRevert(
-        this.tokenController.addNewMember(bobKey, charlie, { from: charlie }),
+        this.tokenController.addNewInvestors([bobKey], [charlie], { from: charlie }),
         'Managered: Msg sender is not admin or manager'
       );
 
@@ -392,7 +392,7 @@ describe('TokenReserve', () => {
     //   // check the previous state
     //   assert.equal(await newTokenSaleVer.wallet(), wallet);
     //   assert.equal(await newTokenSaleVer.tokenToSell(), this.mainToken.address);
-    //   assert.sameMembers(await newTokenSaleVer.getCustomerTokenList(), [
+    //   assert.sameInvestors(await newTokenSaleVer.getCustomerTokenList(), [
     //     this.daiToken.address,
     //     this.tusdToken.address,
     //     this.xchfToken.address
@@ -402,7 +402,7 @@ describe('TokenReserve', () => {
     //
     //   assert.equal(await newTokenSaleRegistryVer.isManager(dan), true);
     //   assert.equal(await newTokenSaleRegistryVer.isCustomerInWhiteList(bob), true);
-    //   assert.sameMembers(await newTokenSaleRegistryVer.getCustomersWhiteList(), [bob]);
+    //   assert.sameInvestors(await newTokenSaleRegistryVer.getCustomersWhiteList(), [bob]);
     // });
   });
 });

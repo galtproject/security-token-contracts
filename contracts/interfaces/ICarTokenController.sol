@@ -11,5 +11,5 @@ pragma solidity ^0.5.13;
 
 
 interface ICarTokenController {
-  function requireMembersAreActive(address _member1, address _member2) external;
+  function requireInvestorsAreActive(address _investor1, address _investor2) external;
 }

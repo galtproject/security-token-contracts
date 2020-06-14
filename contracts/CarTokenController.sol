@@ -17,13 +17,13 @@ contract CarTokenController is Managed {
 
   ICarToken token;
 
-  struct Member {
+  struct Investor {
     address addr;
     bool active;
   }
 
-  mapping(bytes32 => Member) public members;
-  mapping(address => bytes32) public keyOfMember;
+  mapping(bytes32 => Investor) public investors;
+  mapping(address => bytes32) public keyOfInvestor;
 
   constructor () public {}
 
@@ -31,60 +31,87 @@ contract CarTokenController is Managed {
     Ownable.initialize(_owner);
   }
 
-  function setToken(ICarToken _token) public onlyOwner {
+  function setToken(ICarToken _token) external onlyOwner {
     token = _token;
   }
 
-  function addNewMember(bytes32 _key, address _addr) public onlyAdminOrManager {
-    _setMemberAddress(_key, _addr);
+  function addNewInvestors(bytes32[] calldata _keys, address[] calldata _addrs) external onlyAdminOrManager {
+    uint256 len = _keys.length;
+    require(len == _addrs.length, "Lengths of keys and address does not match");
+
+    for (uint256 i = 0; i < len; i++) {
+      _setInvestorAddress(_keys[i], _addrs[i]);
+    }
   }
 
-  function setMemberActive(bytes32 _key, bool _active) public onlyAdminOrManager {
-    require(members[_key].addr != address(0), "Member does not exists");
-    members[_key].active = _active;
+  function setInvestorActive(bytes32 _key, bool _active) external onlyAdminOrManager {
+    require(investors[_key].addr != address(0), "Investor does not exists");
+    investors[_key].active = _active;
   }
 
   function migrateBalance(address _from, address _to) public onlyAdmin {
-    require(isMemberAddressActive(_to), "Recipient member does not active");
+    _migrateBalance(_from, _to);
+  }
+
+  function changeInvestorAddress(bytes32 _investorKey, address _newAddr) external onlyAdmin {
+    _changeInvestorAddress(_investorKey, _newAddr);
+  }
+
+  function changeInvestorAddressAndMigrateBalance(bytes32 _investorKey, address _newAddr) external onlyAdmin {
+    address oldAddress = investors[_investorKey].addr;
+    _changeInvestorAddress(_investorKey, _newAddr);
+    _migrateBalance(oldAddress, _newAddr);
+  }
+
+  function changeMyAddress(bytes32 _investorKey, address _newAddr) external {
+    require(investors[_investorKey].addr == msg.sender, "Investor address and msg.sender does not match");
+
+    _changeInvestorAddress(_investorKey, _newAddr);
+  }
+
+  function changeMyAddressAndMigrateBalance(bytes32 _investorKey, address _newAddr) external {
+    require(investors[_investorKey].addr == msg.sender, "Investor address and msg.sender does not match");
+
+    address oldAddress = investors[_investorKey].addr;
+    _changeInvestorAddress(_investorKey, _newAddr);
+    _migrateBalance(oldAddress, _newAddr);
+  }
+
+  function mintTokens(address _addr, uint256 _amount) external onlyAdmin {
+    token.mint(_addr, _amount);
+  }
+
+  function isInvestorAddressActive(address _addr) public view returns (bool) {
+    return investors[keyOfInvestor[_addr]].active;
+  }
+
+  function requireInvestorsAreActive(address _investor1, address _investor2) public view {
+    require(
+      isInvestorAddressActive(_investor1) && isInvestorAddressActive(_investor2),
+      "The address has no Car token transfer permission"
+    );
+  }
+
+  function _migrateBalance(address _from, address _to) internal {
+    require(isInvestorAddressActive(_to), "Recipient investor does not active");
 
     uint256 fromBalance = token.balanceOf(_from);
     token.burn(_from, fromBalance);
     token.mint(_to, fromBalance);
   }
 
-  function changeMemberAddress(bytes32 _memberKey, address _newAddr) public onlyAdmin {
-    keyOfMember[members[_memberKey].addr] = bytes32(0);
-    members[_memberKey] = Member(address(0), false);
+  function _changeInvestorAddress(bytes32 _investorKey, address _newAddr) internal {
+    keyOfInvestor[investors[_investorKey].addr] = bytes32(0);
+    investors[_investorKey] = Investor(address(0), false);
 
-    _setMemberAddress(_memberKey, _newAddr);
+    _setInvestorAddress(_investorKey, _newAddr);
   }
 
-  function changeMemberAddressAndMigrateBalance(bytes32 _memberKey, address _newAddr) public onlyAdmin {
-    address oldAddress = members[_memberKey].addr;
-    changeMemberAddress(_memberKey, _newAddr);
-    migrateBalance(oldAddress, _newAddr);
-  }
+  function _setInvestorAddress(bytes32 _key, address _addr) internal {
+    require(investors[_key].addr == address(0), "Investor already exists");
+    require(keyOfInvestor[_addr] == bytes32(0), "Address already claimed");
 
-  function mintTokens(address _addr, uint256 _amount) public onlyAdmin {
-    token.mint(_addr, _amount);
-  }
-
-  function isMemberAddressActive(address _addr) public view returns (bool) {
-    return members[keyOfMember[_addr]].active;
-  }
-
-  function requireMembersAreActive(address _member1, address _member2) public view {
-    require(
-      isMemberAddressActive(_member1) && isMemberAddressActive(_member2),
-      "The address has no Car token transfer permission"
-    );
-  }
-
-  function _setMemberAddress(bytes32 _key, address _addr) internal {
-    require(members[_key].addr == address(0), "Member already exists");
-    require(keyOfMember[_addr] == bytes32(0), "Address already claimed");
-
-    members[_key] = Member(_addr, true);
-    keyOfMember[_addr] = _key;
+    investors[_key] = Investor(_addr, true);
+    keyOfInvestor[_addr] = _key;
   }
 }
