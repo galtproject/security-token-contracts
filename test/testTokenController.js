@@ -33,19 +33,19 @@ describe('TokenReserve', () => {
     it('should add and remove admins correctly', async function() {
       assert.equal(await this.tokenController.isAdmin(dan), false);
       assert.equal(await this.tokenController.isManager(dan), false);
-      assert.equal(await this.tokenController.isMemberAddressActive(bob), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), false);
 
       await assertRevert(
-        this.tokenController.addNewMember(bobKey, bob, { from: dan }),
+        this.tokenController.addNewInvestors([bobKey], [bob], { from: dan }),
         'Managered: Msg sender is not admin or manager'
       );
 
-      await this.tokenController.addNewMember(bobKey, bob, { from: owner });
-      assert.equal(await this.tokenController.keyOfMember(bob), bobKey.padEnd(66, '0'));
-      assert.equal((await this.tokenController.members(bobKey)).addr, bob);
+      await this.tokenController.addNewInvestors([bobKey], [bob], { from: owner });
+      assert.equal(await this.tokenController.keyOfInvestor(bob), bobKey.padEnd(66, '0'));
+      assert.equal((await this.tokenController.investors(bobKey)).addr, bob);
 
       await assertRevert(
-        this.tokenController.setMemberActive(bobKey, true, { from: dan }),
+        this.tokenController.setInvestorActive(bobKey, true, { from: dan }),
         'Managered: Msg sender is not admin or manager'
       );
 
@@ -55,7 +55,7 @@ describe('TokenReserve', () => {
       );
 
       await assertRevert(
-        this.tokenController.changeMemberAddress(bobKey, alice, { from: dan }),
+        this.tokenController.changeInvestorAddress(bobKey, alice, { from: dan }),
         'Administrated: Msg sender is not admin'
       );
 
@@ -75,20 +75,20 @@ describe('TokenReserve', () => {
 
       assert.equal(await this.mainToken.balanceOf(bob), ether(1000));
 
-      assert.equal(await this.tokenController.isMemberAddressActive(bob), true);
-      assert.equal(await this.tokenController.isMemberAddressActive(newBob), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), true);
+      assert.equal(await this.tokenController.isInvestorAddressActive(newBob), false);
 
-      await this.tokenController.changeMemberAddressAndMigrateBalance(bobKey, newBob, { from: dan });
+      await this.tokenController.changeInvestorAddressAndMigrateBalance(bobKey, newBob, { from: dan });
 
-      assert.equal(await this.tokenController.isMemberAddressActive(bob), false);
-      assert.equal(await this.tokenController.isMemberAddressActive(newBob), true);
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(newBob), true);
 
       assert.equal(await this.mainToken.balanceOf(bob), ether(0));
       assert.equal(await this.mainToken.balanceOf(newBob), ether(1000));
 
-      await this.tokenController.setMemberActive(bobKey, false, { from: dan });
+      await this.tokenController.setInvestorActive(bobKey, false, { from: dan });
 
-      assert.equal(await this.tokenController.isMemberAddressActive(newBob), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(newBob), false);
     });
   });
 });

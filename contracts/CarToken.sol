@@ -61,12 +61,12 @@ contract CarToken is ERC20, ERC20Detailed, Ownable {
   }
 
   function transfer(address recipient, uint256 amount) public returns (bool) {
-    controller.requireMembersAreActive(_msgSender(), recipient);
+    controller.requireInvestorsAreActive(_msgSender(), recipient);
     return super.transfer(recipient, amount);
   }
 
   function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
-    controller.requireMembersAreActive(sender, recipient);
+    controller.requireInvestorsAreActive(sender, recipient);
     return super.transferFrom(sender, recipient, amount);
   }
 
