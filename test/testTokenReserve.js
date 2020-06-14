@@ -196,6 +196,9 @@ describe('TokenReserve', () => {
       assert.equal(await this.daiToken.balanceOf(bob), ether(1000 - 42));
       assert.equal(await this.daiToken.balanceOf(wallet), ether(42));
 
+      assert.equal(await this.tokenReserve.totalReserved(), ether(42));
+      assert.equal(await this.tokenReserve.currentReserved(), ether(42));
+
       let tokenInfo = await this.tokenReserve.customerTokenInfo(this.daiToken.address);
       assert.equal(tokenInfo.totalReceived, ether(42));
       assert.equal(tokenInfo.totalReserved, ether(42));
