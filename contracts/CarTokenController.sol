@@ -50,24 +50,31 @@ contract CarTokenController is Managed {
   }
 
   function migrateBalance(address _from, address _to) public onlyAdmin {
-    require(isInvestorAddressActive(_to), "Recipient investor does not active");
-
-    uint256 fromBalance = token.balanceOf(_from);
-    token.burn(_from, fromBalance);
-    token.mint(_to, fromBalance);
+    _migrateBalance(_from, _to);
   }
 
-  function changeInvestorAddress(bytes32 _investorKey, address _newAddr) public onlyAdmin {
-    keyOfInvestor[investors[_investorKey].addr] = bytes32(0);
-    investors[_investorKey] = Investor(address(0), false);
-
-    _setInvestorAddress(_investorKey, _newAddr);
+  function changeInvestorAddress(bytes32 _investorKey, address _newAddr) external onlyAdmin {
+    _changeInvestorAddress(_investorKey, _newAddr);
   }
 
   function changeInvestorAddressAndMigrateBalance(bytes32 _investorKey, address _newAddr) external onlyAdmin {
     address oldAddress = investors[_investorKey].addr;
-    changeInvestorAddress(_investorKey, _newAddr);
-    migrateBalance(oldAddress, _newAddr);
+    _changeInvestorAddress(_investorKey, _newAddr);
+    _migrateBalance(oldAddress, _newAddr);
+  }
+
+  function changeMyAddress(bytes32 _investorKey, address _newAddr) external {
+    require(investors[_investorKey].addr == msg.sender, "Investor address and msg.sender does not match");
+
+    _changeInvestorAddress(_investorKey, _newAddr);
+  }
+
+  function changeMyAddressAndMigrateBalance(bytes32 _investorKey, address _newAddr) external {
+    require(investors[_investorKey].addr == msg.sender, "Investor address and msg.sender does not match");
+
+    address oldAddress = investors[_investorKey].addr;
+    _changeInvestorAddress(_investorKey, _newAddr);
+    _migrateBalance(oldAddress, _newAddr);
   }
 
   function mintTokens(address _addr, uint256 _amount) external onlyAdmin {
@@ -83,6 +90,21 @@ contract CarTokenController is Managed {
       isInvestorAddressActive(_investor1) && isInvestorAddressActive(_investor2),
       "The address has no Car token transfer permission"
     );
+  }
+
+  function _migrateBalance(address _from, address _to) internal {
+    require(isInvestorAddressActive(_to), "Recipient investor does not active");
+
+    uint256 fromBalance = token.balanceOf(_from);
+    token.burn(_from, fromBalance);
+    token.mint(_to, fromBalance);
+  }
+
+  function _changeInvestorAddress(bytes32 _investorKey, address _newAddr) internal {
+    keyOfInvestor[investors[_investorKey].addr] = bytes32(0);
+    investors[_investorKey] = Investor(address(0), false);
+
+    _setInvestorAddress(_investorKey, _newAddr);
   }
 
   function _setInvestorAddress(bytes32 _key, address _addr) internal {
