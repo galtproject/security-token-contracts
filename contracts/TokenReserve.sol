@@ -30,6 +30,9 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
 
   address public wallet;
 
+  uint256 public currentReserved;
+  uint256 public totalReserved;
+
   struct TokenInfo {
     uint256 rateMul;
     uint256 rateDiv;
@@ -139,6 +142,9 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
     CustomerInfo storage _customerInfo = customerInfo[_customerAddress];
     _customerInfo.currentReserved = _customerInfo.currentReserved.add(_addAmount);
     _customerInfo.totalReserved = _customerInfo.totalReserved.add(_addAmount);
+
+    currentReserved = currentReserved.add(_addAmount);
+    totalReserved = totalReserved.add(_addAmount);
   }
 
   function distributeReserve(address[] calldata _customers) external onlyAdmin {
@@ -149,6 +155,7 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
       uint256 _amount = customerInfo[_customerAddr].currentReserved;
 
       tokenToSell.safeTransfer(_customerAddr, _amount);
+      currentReserved = currentReserved.sub(customerInfo[_customerAddr].currentReserved);
       customerInfo[_customerAddr].currentReserved = 0;
 
       emit DistributeReservedTokens(msg.sender, _customerAddr, _amount);
