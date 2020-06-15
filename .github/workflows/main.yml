@@ -35,6 +35,8 @@ jobs:
           path: ~/.npm
           key: coverage-node-${{ hashFiles('**/package-lock.json') }}
       - name: Run tests
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
           yarn
           make coverage
