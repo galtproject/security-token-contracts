@@ -41,7 +41,7 @@ const loaderWrapper = {
   }
 };
 
-if(global.before) {
+if (global.before) {
   before(async function() {
     loaderWrapper.contracts.forEach(contract => {
       contract.setProvider(provider);
