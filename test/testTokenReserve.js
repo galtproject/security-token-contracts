@@ -35,6 +35,10 @@ describe('TokenReserve', () => {
     await this.xchfToken.mint(bob, ether(1000));
     await this.xchfToken.mint(dan, ether(1000));
 
+    this.testToken = await MintableErc20Token.new();
+    await this.xchfToken.mint(bob, ether(1000));
+    await this.xchfToken.mint(dan, ether(1000));
+
     const { token, tokenController, tokenReserve } = await deployWhitelistedTokenSale(owner, proxyAdmin);
     this.mainToken = token;
     this.tokenController = tokenController;
@@ -55,6 +59,7 @@ describe('TokenReserve', () => {
     await this.tokenReserve.addOrUpdateCustomerToken(this.daiToken.address, '1', '1', { from: owner });
     await this.tokenReserve.addOrUpdateCustomerToken(this.tusdToken.address, '1', '2', { from: owner });
     await this.tokenReserve.addOrUpdateCustomerToken(this.xchfToken.address, '2', '1', { from: owner });
+    await this.tokenReserve.addOrUpdateCustomerToken(this.testToken.address, '1', ether(1), { from: owner });
   });
 
   describe('initiate', () => {
@@ -99,6 +104,11 @@ describe('TokenReserve', () => {
         this.tokenReserve.getTokenAmount(this.xchfToken.address, '0'),
         "TokenReserve: weiAmount can't be null"
       );
+
+      assert.equal(await this.tokenReserve.getTokenAmount(this.testToken.address, ether(1)), '1');
+      assert.equal(await this.tokenReserve.getTokenAmount(this.testToken.address, ether(2)), '2');
+      assert.equal(await this.tokenReserve.getTokenAmount(this.testToken.address, ether(1.1)), '1');
+      assert.equal(await this.tokenReserve.getTokenAmount(this.testToken.address, ether(1.99)), '1');
     });
   });
 
