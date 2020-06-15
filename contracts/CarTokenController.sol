@@ -9,11 +9,12 @@
 
 pragma solidity ^0.5.13;
 
+import "@galtproject/whitelisted-tokensale/contracts/traits/Pausable.sol";
 import "@galtproject/whitelisted-tokensale/contracts/traits/Managed.sol";
 import "./interfaces/ICarToken.sol";
 
 
-contract CarTokenController is Managed {
+contract CarTokenController is Managed, Pausable {
 
   ICarToken token;
 
@@ -63,13 +64,13 @@ contract CarTokenController is Managed {
     _migrateBalance(oldAddress, _newAddr);
   }
 
-  function changeMyAddress(bytes32 _investorKey, address _newAddr) external {
+  function changeMyAddress(bytes32 _investorKey, address _newAddr) external whenNotPaused {
     require(investors[_investorKey].addr == msg.sender, "Investor address and msg.sender does not match");
 
     _changeInvestorAddress(_investorKey, _newAddr);
   }
 
-  function changeMyAddressAndMigrateBalance(bytes32 _investorKey, address _newAddr) external {
+  function changeMyAddressAndMigrateBalance(bytes32 _investorKey, address _newAddr) external whenNotPaused {
     require(investors[_investorKey].addr == msg.sender, "Investor address and msg.sender does not match");
 
     address oldAddress = investors[_investorKey].addr;
@@ -85,7 +86,7 @@ contract CarTokenController is Managed {
     return investors[keyOfInvestor[_addr]].active;
   }
 
-  function requireInvestorsAreActive(address _investor1, address _investor2) public view {
+  function requireInvestorsAreActive(address _investor1, address _investor2) public whenNotPaused view {
     require(
       isInvestorAddressActive(_investor1) && isInvestorAddressActive(_investor2),
       "The address has no Car token transfer permission"
