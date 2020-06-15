@@ -18,8 +18,8 @@ log() {
 # expects it to be at the top level. We create a symlink to fix this
 ln -s coverageEnv/allFiredEvents allFiredEvents
 
-TEST_ENV_COVERAGE=true SOLC=v0.5.17 truffle run coverage || log "Test run failed"
+TEST_ENV_COVERAGE=true SOLC=v0.5.17 truffle run coverage
 
 if [ "$CI" = true ]; then
-  curl -s https://codecov.io/bash | bash -s -- -C "$CIRCLE_SHA1"
+  bash <(curl -s https://codecov.io/bash)
 fi
