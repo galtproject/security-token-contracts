@@ -154,5 +154,64 @@ describe('TokenController', () => {
       assert.equal(await this.mainToken.balanceOf(alice), ether(0));
       assert.equal(await this.mainToken.balanceOf(newAlice), ether(1000));
     });
+
+    it('pause and deactivate should work', async function() {
+      await this.tokenController.addNewInvestors([bobKey, aliceKey], [bob, alice], { from: owner });
+
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), true);
+      assert.equal(await this.tokenController.keyOfInvestor(bob), bobKey.padEnd(66, '0'));
+      assert.equal((await this.tokenController.investors(bobKey)).addr, bob);
+
+      await this.tokenController.mintTokens(bob, ether(1000), { from: owner });
+      await this.tokenController.mintTokens(alice, ether(1000), { from: owner });
+
+      assert.equal(await this.mainToken.balanceOf(bob), ether(1000));
+
+      assert.equal(await this.tokenController.isInvestorAddressActive(newBob), false);
+
+      await this.tokenController.pause({ from: owner });
+
+      await assertRevert(
+        this.mainToken.transfer(alice, ether(10), { from: bob }),
+        'Pausable: paused'
+      );
+
+      await assertRevert(
+        this.tokenController.changeMyAddress(bobKey, newBob, { from: bob }),
+        'Pausable: paused'
+      );
+
+      await assertRevert(
+        this.tokenController.changeMyAddressAndMigrateBalance(bobKey, newBob, { from: bob }),
+        'Pausable: paused'
+      );
+
+      await this.tokenController.unpause({ from: owner });
+
+      await this.tokenController.changeMyAddressAndMigrateBalance(bobKey, newBob, { from: bob });
+
+      await this.mainToken.transfer(alice, ether(10), { from: newBob });
+
+      assert.equal(await this.tokenController.isInvestorAddressActive(bob), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(newBob), true);
+
+      assert.equal(await this.mainToken.balanceOf(bob), ether(0));
+      assert.equal((await this.mainToken.balanceOf(newBob)).toString(10), ether(990));
+      assert.equal((await this.mainToken.balanceOf(alice)).toString(10), ether(1010));
+
+      await this.tokenController.setInvestorActive(bobKey, false, { from: owner });
+
+      await assertRevert(
+        this.mainToken.transfer(alice, ether(10), { from: newBob }),
+        'The address has no Car token transfer permission'
+      );
+
+      await this.tokenController.setInvestorActive(bobKey, true, { from: owner });
+
+      await this.mainToken.transfer(alice, ether(10), { from: newBob });
+
+      assert.equal((await this.mainToken.balanceOf(newBob)).toString(10), ether(980));
+      assert.equal((await this.mainToken.balanceOf(alice)).toString(10), ether(1020));
+    });
   });
 });
