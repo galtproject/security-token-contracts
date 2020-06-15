@@ -41,7 +41,7 @@ module.exports = function(deployer, network, accounts) {
 
     console.log('tokenController.mintTokens');
     await Promise.all([
-      tokenController.mintTokens(tokenReserve.address, web3Utils.toWei((10 ** 6).toString(), 'wei')),
+      tokenController.mintTokens(tokenReserve.address, web3Utils.toWei('1100000', 'wei')),
       tokenController.addAdmin(owner),
       tokenReserve.addAdmin(owner),
       tokenReserve.addAdmin(reserveBot),

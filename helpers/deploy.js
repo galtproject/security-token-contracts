@@ -5,14 +5,19 @@ const { ZWeb3, SimpleProject, Contracts } = require('@openzeppelin/upgrades');
 
 const ozWeb3 = web3;
 
-module.exports = function() {
-  const getContract = Contracts.getFromLocal.bind(contract);
-  const getResultContract = contract.fromArtifact.bind(contract);
+module.exports = function(artifacts) {
+  const getContract = artifacts ? Contracts.getFromLocal.bind(contract) : Contracts.getFromLocal.bind(contract);
+  const getResultContract = artifacts ? artifacts.require.bind(artifacts) : contract.fromArtifact.bind(contract);
+
+  if (artifacts) {
+    ZWeb3.initialize(artifacts.require('CarToken').web3.currentProvider);
+  } else {
+    ZWeb3.initialize(ozWeb3.currentProvider);
+  }
 
   // eslint-disable-next-line
   Contracts.buildDir = Contracts.DEFAULT_BUILD_DIR = artifactsDir;
 
-  ZWeb3.initialize(ozWeb3.currentProvider);
   const CarToken = getResultContract('CarToken');
   const TokenReserve = getContract('TokenReserve');
   const CarTokenController = getContract('CarTokenController');

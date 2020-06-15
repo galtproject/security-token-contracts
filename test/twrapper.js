@@ -41,14 +41,16 @@ const loaderWrapper = {
   }
 };
 
-before(async function() {
-  loaderWrapper.contracts.forEach(contract => {
-    contract.setProvider(provider);
-    contract.defaults({
-      from: testHelpers.defaultSender
+if(global.before) {
+  before(async function() {
+    loaderWrapper.contracts.forEach(contract => {
+      contract.setProvider(provider);
+      contract.defaults({
+        from: testHelpers.defaultSender
+      });
     });
   });
-});
+}
 
 module.exports = {
   contract: loaderWrapper,
