@@ -115,4 +115,43 @@ contract CarTokenController is Managed, Pausable {
     investors[_key] = Investor(_addr, true);
     keyOfInvestor[_addr] = _key;
   }
+
+  function checkTransfer(address from, address to, uint256 amount) public view returns(bool success, string memory error) {
+    if (from == address(0)) {
+      return (false, "ERC20: transfer from the zero address");
+    }
+    if (to == address(0)) {
+      return (false, "ERC20: transfer to the zero address");
+    }
+    if (token.balanceOf(from) < amount) {
+      return (false, "ERC20: transfer amount exceeds balance");
+    }
+    if (!isInvestorAddressActive(from) || !isInvestorAddressActive(to)) {
+      return (false, "The address has no Car token transfer permission");
+    }
+    if (paused()) {
+      return (false, "Pausable: paused");
+    }
+    return (true, "");
+  }
+
+  function checkTransferFrom(
+    address sender,
+    address from,
+    address to,
+    uint256 amount
+  )
+    external
+    view
+    returns (bool success, string memory error)
+  {
+    (bool success, string memory error) = checkTransfer(from, to, amount);
+    if (!success) {
+      return (success, error);
+    }
+    if (token.allowance(from, sender) < amount) {
+      return (false, "ERC20: transfer amount exceeds allowance");
+    }
+    return (true, "");
+  }
 }

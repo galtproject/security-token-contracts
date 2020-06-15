@@ -16,4 +16,6 @@ interface ICarToken {
   function mint(address account, uint256 amount) external;
 
   function burn(address account, uint256 amount) external;
+
+  function allowance(address owner, address spender) external view returns (uint256);
 }
