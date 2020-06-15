@@ -14,12 +14,12 @@ import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@galtproject/whitelisted-tokensale/contracts/interfaces/IWhitelistedTokenSale.sol";
-import "@galtproject/whitelisted-tokensale/contracts/traits/Administrated.sol";
+import "@galtproject/whitelisted-tokensale/contracts/traits/Managed.sol";
 import "@galtproject/whitelisted-tokensale/contracts/traits/Pausable.sol";
 import "./interfaces/ITokenReserve.sol";
 
 
-contract TokenReserve is Administrated, ITokenReserve, Pausable {
+contract TokenReserve is Managed, ITokenReserve, Pausable {
   using EnumerableSet for EnumerableSet.AddressSet;
   using SafeERC20 for IERC20;
   using SafeMath for uint256;
@@ -102,7 +102,7 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
     string calldata _paymentDetails
   )
     external
-    onlyAdmin
+    onlyAdminOrManager
   {
     uint256 _resultTokenAmount = _reserveTokens(_customerToken, _customerAddress, _weiAmount, false);
 
@@ -119,7 +119,7 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
     );
   }
 
-  function changeOrderReserve(uint256 _orderId, uint256 _changeAmount, bool _isAdd) external onlyAdmin {
+  function changeOrderReserve(uint256 _orderId, uint256 _changeAmount, bool _isAdd) external onlyAdminOrManager {
     ReservedOrder storage reservedOrder = reservedOrders[_orderId];
     require(!reservedOrder.onWallet, "Reserve changing available only for orders added by admins");
 

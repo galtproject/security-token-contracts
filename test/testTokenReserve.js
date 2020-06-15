@@ -16,7 +16,7 @@ const { utf8ToHex } = web3.utils;
 // const bytes32 = utf8ToHex;
 
 describe('TokenReserve', () => {
-  const [owner, proxyAdmin, bob, charlie, dan, wallet, alice] = accounts;
+  const [owner, proxyAdmin, bob, charlie, dan, wallet, alice, manager] = accounts;
 
   const bobKey = utf8ToHex('bob');
   const aliceKey = utf8ToHex('alice');
@@ -35,6 +35,10 @@ describe('TokenReserve', () => {
     await this.xchfToken.mint(bob, ether(1000));
     await this.xchfToken.mint(dan, ether(1000));
 
+    this.testToken = await MintableErc20Token.new();
+    await this.testToken.mint(bob, ether(1000));
+    await this.testToken.mint(dan, ether(1000));
+
     const { token, tokenController, tokenReserve } = await deployWhitelistedTokenSale(owner, proxyAdmin);
     this.mainToken = token;
     this.tokenController = tokenController;
@@ -42,6 +46,9 @@ describe('TokenReserve', () => {
 
     await this.tokenReserve.addAdmin(owner, { from: owner });
     await this.tokenController.addAdmin(owner, { from: owner });
+
+    await this.tokenReserve.addManager(manager, { from: owner });
+    await this.tokenController.addManager(manager, { from: owner });
 
     await this.tokenController.addNewInvestors([reserveKey], [this.tokenReserve.address], { from: owner });
 
@@ -55,6 +62,7 @@ describe('TokenReserve', () => {
     await this.tokenReserve.addOrUpdateCustomerToken(this.daiToken.address, '1', '1', { from: owner });
     await this.tokenReserve.addOrUpdateCustomerToken(this.tusdToken.address, '1', '2', { from: owner });
     await this.tokenReserve.addOrUpdateCustomerToken(this.xchfToken.address, '2', '1', { from: owner });
+    await this.tokenReserve.addOrUpdateCustomerToken(this.testToken.address, '1', ether(1), { from: owner });
   });
 
   describe('initiate', () => {
@@ -69,9 +77,10 @@ describe('TokenReserve', () => {
       assert.sameMembers(await this.tokenReserve.getCustomerTokenList(), [
         this.daiToken.address,
         this.tusdToken.address,
-        this.xchfToken.address
+        this.xchfToken.address,
+        this.testToken.address
       ]);
-      assert.equal(await this.tokenReserve.getCustomerTokenCount(), '3');
+      assert.equal(await this.tokenReserve.getCustomerTokenCount(), '4');
       assert.equal(await this.tokenReserve.isTokenAvailable(this.daiToken.address), true);
       assert.equal(await this.tokenReserve.isTokenAvailable(dan), false);
     });
@@ -99,6 +108,11 @@ describe('TokenReserve', () => {
         this.tokenReserve.getTokenAmount(this.xchfToken.address, '0'),
         "TokenReserve: weiAmount can't be null"
       );
+
+      assert.equal(await this.tokenReserve.getTokenAmount(this.testToken.address, ether(1)), '1');
+      assert.equal(await this.tokenReserve.getTokenAmount(this.testToken.address, ether(2)), '2');
+      assert.equal(await this.tokenReserve.getTokenAmount(this.testToken.address, ether(1.1)), '1');
+      assert.equal(await this.tokenReserve.getTokenAmount(this.testToken.address, ether(1.99)), '1');
     });
   });
 
@@ -221,6 +235,11 @@ describe('TokenReserve', () => {
         'Administrated: Msg sender is not admin'
       );
 
+      await assertRevert(
+        this.tokenReserve.distributeReserve([bob], { from: manager }),
+        'Administrated: Msg sender is not admin'
+      );
+
       // await this.mainToken.contract.methods.transfer(bob, ether(42)).estimateGas({from: this.tokenReserve.address});
 
       await this.tokenReserve.distributeReserve([bob], { from: dan });
@@ -266,7 +285,7 @@ describe('TokenReserve', () => {
 
       await assertRevert(
         this.tokenReserve.changeOrderReserve(orderId, ether(100), true, { from: bob }),
-        'Administrated: Msg sender is not admin'
+        'Managered: Msg sender is not admin or manager'
       );
 
       await this.tokenReserve.changeOrderReserve(orderId, ether(100), true, { from: owner });

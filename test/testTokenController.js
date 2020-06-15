@@ -130,6 +130,10 @@ describe('TokenController', () => {
         this.tokenController.changeMyAddressAndMigrateBalance(aliceKey, bob, { from: alice }),
         'Address already claimed'
       );
+      await assertRevert(
+        this.tokenController.changeMyAddressAndMigrateBalance(bobKey, bob, { from: bob }),
+        'Old address and new address the same'
+      );
       await this.tokenController.changeMyAddressAndMigrateBalance(bobKey, newBob, { from: bob });
 
       assert.equal(await this.tokenController.isInvestorAddressActive(bob), false);
