@@ -29,7 +29,8 @@ interface ITokenReserve {
     address indexed customer,
     address indexed token,
     uint256 tokenAmount,
-    uint256 resultAmount
+    uint256 resultAmount,
+    string paymentDetails
   );
   event DistributeReservedTokens(address indexed admin, address indexed customer, uint256 amount);
 }

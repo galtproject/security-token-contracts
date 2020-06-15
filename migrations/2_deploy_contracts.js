@@ -10,6 +10,7 @@ module.exports = function(deployer, network, accounts) {
     const proxyAdmin = '0xE006A0BB078291e539B3c7b9c8A8aF7f29215600';
     const owner = '0xB844C65F3E161061bA5D5dD8497B3C04B71c4c83';
     const wallet = '0xB844C65F3E161061bA5D5dD8497B3C04B71c4c83';
+    const reserveBot = '0x1E22CD513b9776b539afc8d77C1a28b42d9d4C8E';
 
     const testStableToken1 = await ERC20Token.new('TESTStable 1', 'TST1', '18');
     const testStableToken2 = await ERC20Token.new('TESTStable 2', 'TST2', '18');
@@ -37,6 +38,7 @@ module.exports = function(deployer, network, accounts) {
       tokenController.mintTokens(tokenReserve.address, web3Utils.toWei((10 ** 6).toString(), 'wei')),
       tokenController.addAdmin(owner),
       tokenReserve.addAdmin(owner),
+      tokenReserve.addAdmin(reserveBot),
       tokenReserve.setWallet(wallet),
       tokenReserve.addOrUpdateCustomerToken(testStableToken1.address, '1', web3Utils.toWei('1', 'ether')),
       tokenReserve.addOrUpdateCustomerToken(testStableToken2.address, '2', web3Utils.toWei('1', 'ether'))
