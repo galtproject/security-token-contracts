@@ -53,7 +53,7 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
     string paymentDetails;
   }
 
-  uint256 ordersReservedCount;
+  uint256 public ordersReservedCount;
   mapping(uint256 => ReservedOrder) public reservedOrders;
 
   struct CustomerInfo {
@@ -195,9 +195,10 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
       address _customerAddr = _customers[i];
       uint256 _amount = customerInfo[_customerAddr].currentReserved;
 
-      tokenToSell.safeTransfer(_customerAddr, _amount);
       currentReserved = currentReserved.sub(customerInfo[_customerAddr].currentReserved);
       customerInfo[_customerAddr].currentReserved = 0;
+
+      tokenToSell.safeTransfer(_customerAddr, _amount);
 
       emit DistributeReservedTokens(msg.sender, _customerAddr, _amount);
     }

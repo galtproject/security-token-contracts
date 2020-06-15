@@ -47,7 +47,7 @@ const config = {
   },
   compilers: {
     solc: {
-      version: process.env.SOLC || 'native',
+      version: process.env.SOLC || '0.5.13',
       settings: {
         optimizer: {
           enabled: true,
