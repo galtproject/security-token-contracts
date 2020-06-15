@@ -30,7 +30,7 @@
 
 :page_with_curl: **For more information check the [Website](https://curioinvest.com/)**
 
-:construction: **@security-token-contracts stage: Mainnet**
+:construction: **[@security-token-contracts](https://github.com/galtproject/car-token-contracts/): Ethereum Mainnet**
 
 :bomb: **Security review status: Unaudited. At the moment, [@security-token-contracts](https://github.com/galtproject/car-token-contracts/) contracts are deployed on the Ethereum mainnet. Nonetheless it is still experimental software that has not yet been publicly audited. Use it on your own risk!****
 
