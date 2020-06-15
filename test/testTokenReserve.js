@@ -188,6 +188,11 @@ describe('TokenReserve', () => {
       let orderId = _.find(res.logs, l => l.args.orderId).args.orderId;
       assert.equal(orderId.toString(), '1');
 
+      await assertRevert(
+        this.tokenReserve.changeOrderReserve(orderId, ether(100), true, {from: owner}),
+        'Reserve changing available only for orders added by admins'
+      );
+
       let order = await this.tokenReserve.reservedOrders(orderId);
       assert.equal(order.customerTokenAddress, this.daiToken.address);
       assert.equal(order.customerAddress, bob);

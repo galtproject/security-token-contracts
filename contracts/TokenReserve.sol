@@ -121,7 +121,7 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
 
   function changeOrderReserve(uint256 _orderId, uint256 _changeAmount, bool _isAdd) external onlyAdmin {
     ReservedOrder storage reservedOrder = reservedOrders[_orderId];
-    require(!reservedOrder.onWallet, "Reserve edit available only for orders added by admins");
+    require(!reservedOrder.onWallet, "Reserve changing available only for orders added by admins");
 
     CustomerInfo storage orderCustomer = customerInfo[reservedOrder.customerAddress];
 
