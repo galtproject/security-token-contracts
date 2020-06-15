@@ -28,7 +28,7 @@
 ## Curio security tokens distribution
 **Contracts for safety investments and tokens holding. Using this contracts - investors can be sure that their funds will not be stolen or lost. Flexible logic of investments reserving allows all participants to make the deals off-chain or on-chain.**
 
-:page_with_curl: **For more information check the [Website](https://curioinvest.com/)**
+:page_with_curl: **Contracts developed by order with Curio Capital (CH) Limited (Company Number CHF-211.446.654) Incorporated and registered in Zug, Switzerland. For more information check the [Website](https://curioinvest.com/)**
 
 :construction: **[@security-token-contracts](https://github.com/galtproject/car-token-contracts/): Ethereum Mainnet**
 
