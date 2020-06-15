@@ -108,7 +108,7 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
 
     reservedOrders[ordersReservedCount].paymentDetails = _paymentDetails;
 
-    emit AddReserveTokens(ordersReservedCount, msg.sender, _customerAddress, address(_customerToken), _weiAmount, _resultTokenAmount);
+    emit AddReserveTokens(ordersReservedCount, msg.sender, _customerAddress, address(_customerToken), _weiAmount, _resultTokenAmount, _paymentDetails);
   }
 
   function _reserveTokens(
