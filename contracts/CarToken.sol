@@ -69,28 +69,4 @@ contract CarToken is ERC20, ERC20Detailed, Ownable {
     controller.requireInvestorsAreActive(sender, recipient);
     return super.transferFrom(sender, recipient, amount);
   }
-
-  //  function checkTransfer(address from, address to, uint256 amount) public view returns(bool, string) {
-  //    if (from == address(0)) {
-  //      return (false, "ERC20: transfer from the zero address");
-  //    }
-  //    if (to == address(0)) {
-  //      return (false, "ERC20: transfer to the zero address");
-  //    }
-  //    if (balances[from] < amount) {
-  //      return (false, "ERC20: transfer amount exceeds balance");
-  //    }
-  //    return (true, "");
-  //  }
-  //
-  //  function checkTransferFrom(address sender, address from, address to, uint256 amount) public view returns(bool, string) {
-  //    (bool success, string memory error) = checkTransfer(from, to, amount);
-  //    if (!success) {
-  //      return (success, error);
-  //    }
-  //    if (_allowances[from][sender] < amount) {
-  //      return (false, "ERC20: transfer amount exceeds allowance");
-  //    }
-  //    return (true, "");
-  //  }
 }

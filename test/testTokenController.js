@@ -238,5 +238,52 @@ describe('TokenController', () => {
       assert.equal((await this.mainToken.balanceOf(newBob)).toString(10), ether(980));
       assert.equal((await this.mainToken.balanceOf(alice)).toString(10), ether(1020));
     });
+
+    it('checkTransfer and checkTransferFrom should work', async function() {
+      let res = await this.tokenController.checkTransfer(bob, alice, ether(1));
+      assert.equal(res.success, false);
+      assert.equal(res.error, 'ERC20: transfer amount exceeds balance');
+
+      await this.tokenController.mintTokens(bob, ether(1000), { from: owner });
+      await this.tokenController.mintTokens(alice, ether(1000), { from: owner });
+
+      res = await this.tokenController.checkTransfer(bob, alice, ether(1));
+      assert.equal(res.success, false);
+      assert.equal(res.error, 'The address has no Car token transfer permission');
+
+      await this.tokenController.addNewInvestors([bobKey, aliceKey], [bob, alice], { from: owner });
+
+      res = await this.tokenController.checkTransfer(bob, alice, ether(1));
+      assert.equal(res.success, true);
+      assert.equal(res.error, '');
+
+      await this.mainToken.transfer(alice, ether(1), { from: bob });
+
+      res = await this.tokenController.checkTransfer(bob, alice, ether(1));
+      assert.equal(res.success, true);
+      assert.equal(res.error, '');
+
+      await this.tokenController.pause({ from: owner });
+
+      res = await this.tokenController.checkTransfer(bob, alice, ether(1));
+      assert.equal(res.success, false);
+      assert.equal(res.error, 'Pausable: paused');
+
+      await this.tokenController.unpause({ from: owner });
+
+      res = await this.tokenController.checkTransfer(bob, alice, ether(1));
+      assert.equal(res.success, true);
+      assert.equal(res.error, '');
+
+      res = await this.tokenController.checkTransferFrom(owner, bob, alice, ether(1));
+      assert.equal(res.success, false);
+      assert.equal(res.error, 'ERC20: transfer amount exceeds allowance');
+
+      await this.mainToken.approve(owner, ether(1), { from: bob });
+
+      res = await this.tokenController.checkTransfer(bob, alice, ether(1));
+      assert.equal(res.success, true);
+      assert.equal(res.error, '');
+    });
   });
 });
