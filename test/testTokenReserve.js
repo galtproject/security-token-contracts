@@ -180,12 +180,12 @@ describe('TokenReserve', () => {
 
       assert.equal(await this.daiToken.allowance(bob, this.tokenReserve.address), ether(42));
 
-      const res = await this.tokenReserve.reserveTokens(this.daiToken.address, bob, ether(42), { from: bob });
+      let res = await this.tokenReserve.reserveTokens(this.daiToken.address, bob, ether(42), { from: bob });
 
-      const orderId = _.find(res.logs, l => l.args.orderId).args.orderId;
+      let orderId = _.find(res.logs, l => l.args.orderId).args.orderId;
       assert.equal(orderId.toString(), '1');
 
-      const order = await this.tokenReserve.reservedOrders(orderId);
+      let order = await this.tokenReserve.reservedOrders(orderId);
       assert.equal(order.customerTokenAddress, this.daiToken.address);
       assert.equal(order.customerAddress, bob);
       assert.equal(order.customerTokenAmount, ether(42));
@@ -232,7 +232,21 @@ describe('TokenReserve', () => {
 
       tokenInfo = await this.tokenReserve.customerTokenInfo(this.daiToken.address);
       assert.equal(tokenInfo.totalReceived, ether(84));
+      assert.equal(tokenInfo.onWalletTotalReceived, ether(84));
       assert.equal(tokenInfo.totalSold, ether(84));
+
+      res = await this.tokenReserve.addReserveTokens(this.daiToken.address, alice, ether(42), 'changelly:123', {
+        from: owner
+      });
+
+      tokenInfo = await this.tokenReserve.customerTokenInfo(this.daiToken.address);
+      assert.equal(tokenInfo.totalReceived, ether(126));
+      assert.equal(tokenInfo.onWalletTotalReceived, ether(84));
+      assert.equal(tokenInfo.totalSold, ether(126));
+
+      orderId = _.find(res.logs, l => l.args.orderId).args.orderId;
+      order = await this.tokenReserve.reservedOrders(orderId);
+      assert.equal(order.paymentDetails, 'changelly:123');
     });
 
     it('should successfully reserveTokens with rate 1/2', async function() {

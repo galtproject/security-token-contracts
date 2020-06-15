@@ -50,6 +50,7 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
     uint256 tokenToSellAmount;
     address customerAddress;
     bool onWallet;
+    string paymentDetails;
   }
 
   uint256 ordersReservedCount;
@@ -94,8 +95,18 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
     emit ReserveTokens(ordersReservedCount, msg.sender, _customerAddress, address(_customerToken), _weiAmount, _resultTokenAmount);
   }
 
-  function addReserveTokens(IERC20 _customerToken, address _customerAddress, uint256 _weiAmount) external onlyAdmin {
+  function addReserveTokens(
+    IERC20 _customerToken,
+    address _customerAddress,
+    uint256 _weiAmount,
+    string calldata _paymentDetails
+  )
+    external
+    onlyAdmin
+  {
     uint256 _resultTokenAmount = _reserveTokens(_customerToken, _customerAddress, _weiAmount, false);
+
+    reservedOrders[ordersReservedCount].paymentDetails = _paymentDetails;
 
     emit AddReserveTokens(ordersReservedCount, msg.sender, _customerAddress, address(_customerToken), _weiAmount, _resultTokenAmount);
   }
@@ -126,7 +137,8 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
       _weiAmount,
       _resultTokenAmount,
       _customerAddress,
-      _transferToWallet
+      _transferToWallet,
+      ""
     );
 
     if (_transferToWallet) {
