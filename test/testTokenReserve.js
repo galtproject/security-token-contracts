@@ -19,6 +19,7 @@ describe('TokenReserve', () => {
   const [owner, proxyAdmin, bob, charlie, dan, wallet, alice] = accounts;
 
   const bobKey = utf8ToHex('bob');
+  const aliceKey = utf8ToHex('alice');
   const reserveKey = utf8ToHex('reserve');
 
   beforeEach(async function() {
@@ -187,11 +188,16 @@ describe('TokenReserve', () => {
       let orderId = _.find(res.logs, l => l.args.orderId).args.orderId;
       assert.equal(orderId.toString(), '1');
 
+      await assertRevert(
+        this.tokenReserve.changeOrderReserve(orderId, ether(100), true, { from: owner }),
+        'Reserve changing available only for orders added by admins'
+      );
+
       let order = await this.tokenReserve.reservedOrders(orderId);
       assert.equal(order.customerTokenAddress, this.daiToken.address);
       assert.equal(order.customerAddress, bob);
       assert.equal(order.customerTokenAmount, ether(42));
-      assert.equal(order.tokenToSellAmount, ether(42));
+      assert.equal(order.reservedAmount, ether(42));
       assert.equal(order.onWallet, true);
 
       assert.equal(await this.mainToken.balanceOf(bob), ether(0));
@@ -241,6 +247,10 @@ describe('TokenReserve', () => {
         from: owner
       });
 
+      customerInfo = await this.tokenReserve.customerInfo(alice);
+      assert.equal(customerInfo.currentReserved, ether(42));
+      assert.equal(customerInfo.totalReserved, ether(42));
+
       tokenInfo = await this.tokenReserve.customerTokenInfo(this.daiToken.address);
       assert.equal(tokenInfo.totalReceived, ether(126));
       assert.equal(tokenInfo.onWalletTotalReceived, ether(84));
@@ -249,6 +259,72 @@ describe('TokenReserve', () => {
       orderId = _.find(res.logs, l => l.args.orderId).args.orderId;
       order = await this.tokenReserve.reservedOrders(orderId);
       assert.equal(order.paymentDetails, 'changelly:123');
+      assert.equal(order.reservedAmount, ether(42));
+
+      assert.equal(await this.tokenReserve.currentReserved(), ether(84));
+      assert.equal(await this.tokenReserve.totalReserved(), ether(126));
+
+      await assertRevert(
+        this.tokenReserve.changeOrderReserve(orderId, ether(100), true, { from: bob }),
+        'Administrated: Msg sender is not admin'
+      );
+
+      await this.tokenReserve.changeOrderReserve(orderId, ether(100), true, { from: owner });
+
+      order = await this.tokenReserve.reservedOrders(orderId);
+      assert.equal(order.reservedAmount, ether(142));
+
+      customerInfo = await this.tokenReserve.customerInfo(alice);
+      assert.equal(customerInfo.currentReserved, ether(142));
+      assert.equal(customerInfo.totalReserved, ether(142));
+
+      assert.equal(await this.tokenReserve.currentReserved(), ether(184));
+      assert.equal(await this.tokenReserve.totalReserved(), ether(226));
+
+      await this.tokenReserve.changeOrderReserve(orderId, ether(10), false, { from: owner });
+
+      order = await this.tokenReserve.reservedOrders(orderId);
+      assert.equal(order.reservedAmount, ether(132));
+
+      customerInfo = await this.tokenReserve.customerInfo(alice);
+      assert.equal(customerInfo.currentReserved, ether(132));
+      assert.equal(customerInfo.totalReserved, ether(132));
+
+      assert.equal(await this.tokenReserve.currentReserved(), ether(174));
+      assert.equal(await this.tokenReserve.totalReserved(), ether(216));
+
+      await assertRevert(
+        this.tokenReserve.distributeReserve([alice], { from: dan }),
+        'SafeERC20: low-level call failed'
+      );
+
+      await this.tokenController.addNewInvestors([aliceKey], [alice], { from: dan });
+
+      await this.tokenReserve.distributeReserve([alice], { from: dan });
+
+      customerInfo = await this.tokenReserve.customerInfo(alice);
+      assert.equal(customerInfo.currentReserved, ether(0));
+      assert.equal(customerInfo.totalReserved, ether(132));
+
+      assert.equal(await this.tokenReserve.currentReserved(), ether(42));
+      assert.equal(await this.tokenReserve.totalReserved(), ether(216));
+
+      assert.equal(await this.mainToken.balanceOf(alice), ether(132));
+
+      customerInfo = await this.tokenReserve.customerInfo(bob);
+      assert.equal(customerInfo.currentReserved, ether(42));
+      assert.equal(customerInfo.totalReserved, ether(84));
+
+      await this.tokenReserve.distributeReserve([bob], { from: dan });
+
+      customerInfo = await this.tokenReserve.customerInfo(bob);
+      assert.equal(customerInfo.currentReserved, ether(0));
+      assert.equal(customerInfo.totalReserved, ether(84));
+
+      assert.equal(await this.tokenReserve.currentReserved(), ether(0));
+      assert.equal(await this.tokenReserve.totalReserved(), ether(216));
+
+      assert.equal(await this.mainToken.balanceOf(bob), ether(84));
     });
 
     it('should successfully reserveTokens with rate 1/2', async function() {

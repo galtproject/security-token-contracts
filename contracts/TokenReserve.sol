@@ -47,13 +47,13 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
   struct ReservedOrder {
     address customerTokenAddress;
     uint256 customerTokenAmount;
-    uint256 tokenToSellAmount;
+    uint256 reservedAmount;
     address customerAddress;
     bool onWallet;
     string paymentDetails;
   }
 
-  uint256 ordersReservedCount;
+  uint256 public ordersReservedCount;
   mapping(uint256 => ReservedOrder) public reservedOrders;
 
   struct CustomerInfo {
@@ -119,6 +119,27 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
     );
   }
 
+  function changeOrderReserve(uint256 _orderId, uint256 _changeAmount, bool _isAdd) external onlyAdmin {
+    ReservedOrder storage reservedOrder = reservedOrders[_orderId];
+    require(!reservedOrder.onWallet, "Reserve changing available only for orders added by admins");
+
+    CustomerInfo storage orderCustomer = customerInfo[reservedOrder.customerAddress];
+
+    if (_isAdd) {
+      reservedOrder.reservedAmount = reservedOrder.reservedAmount.add(_changeAmount);
+      orderCustomer.currentReserved = orderCustomer.currentReserved.add(_changeAmount);
+      orderCustomer.totalReserved = orderCustomer.totalReserved.add(_changeAmount);
+      currentReserved = currentReserved.add(_changeAmount);
+      totalReserved = totalReserved.add(_changeAmount);
+    } else {
+      reservedOrder.reservedAmount = reservedOrder.reservedAmount.sub(_changeAmount);
+      orderCustomer.currentReserved = orderCustomer.currentReserved.sub(_changeAmount);
+      orderCustomer.totalReserved = orderCustomer.totalReserved.sub(_changeAmount);
+      currentReserved = currentReserved.sub(_changeAmount);
+      totalReserved = totalReserved.sub(_changeAmount);
+    }
+  }
+
   function _reserveTokens(
     IERC20 _customerToken,
     address _customerAddress,
@@ -174,9 +195,10 @@ contract TokenReserve is Administrated, ITokenReserve, Pausable {
       address _customerAddr = _customers[i];
       uint256 _amount = customerInfo[_customerAddr].currentReserved;
 
-      tokenToSell.safeTransfer(_customerAddr, _amount);
       currentReserved = currentReserved.sub(customerInfo[_customerAddr].currentReserved);
       customerInfo[_customerAddr].currentReserved = 0;
+
+      tokenToSell.safeTransfer(_customerAddr, _amount);
 
       emit DistributeReservedTokens(msg.sender, _customerAddr, _amount);
     }

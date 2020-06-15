@@ -15,7 +15,7 @@ const { utf8ToHex } = web3.utils;
 // const bytes32 = utf8ToHex;
 
 describe('TokenController', () => {
-  const [owner, proxyAdmin, bob, newBob, dan, alice, newAlice] = accounts;
+  const [owner, proxyAdmin, bob, newBob, dan, alice, newAlice, newAlice2] = accounts;
 
   const bobKey = utf8ToHex('bob');
   const aliceKey = utf8ToHex('alice');
@@ -119,12 +119,16 @@ describe('TokenController', () => {
       assert.equal(await this.tokenController.isInvestorAddressActive(newBob), false);
 
       await assertRevert(
-        this.tokenController.changeMyAddressAndMigrateBalance(bobKey, newBob, { from: owner }),
+        this.tokenController.changeMyAddressAndMigrateBalance(bobKey, newBob, { from: alice }),
         'Investor address and msg.sender does not match'
       );
       await assertRevert(
         this.tokenController.changeMyAddressAndMigrateBalance(aliceKey, newBob, { from: bob }),
         'Investor address and msg.sender does not match'
+      );
+      await assertRevert(
+        this.tokenController.changeMyAddressAndMigrateBalance(aliceKey, bob, { from: alice }),
+        'Address already claimed'
       );
       await this.tokenController.changeMyAddressAndMigrateBalance(bobKey, newBob, { from: bob });
 
@@ -140,19 +144,44 @@ describe('TokenController', () => {
         this.tokenController.changeMyAddress(aliceKey, newBob, { from: alice }),
         'Address already claimed'
       );
+      await assertRevert(
+        this.tokenController.changeMyAddress(aliceKey, newBob, { from: bob }),
+        'Investor address and msg.sender does not match'
+      );
 
       await this.tokenController.changeMyAddress(aliceKey, newAlice, { from: alice });
 
-      assert.equal(await this.tokenController.isInvestorAddressActive(bob), false);
-      assert.equal(await this.tokenController.isInvestorAddressActive(newBob), true);
+      assert.equal(await this.tokenController.isInvestorAddressActive(alice), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(newAlice), true);
 
       assert.equal(await this.mainToken.balanceOf(alice), ether(1000));
       assert.equal(await this.mainToken.balanceOf(newAlice), ether(0));
+
+      await this.tokenController.setInvestorActive(aliceKey, false, { from: owner });
+
+      await assertRevert(
+        this.tokenController.migrateBalance(alice, newAlice, { from: owner }),
+        'Recipient investor does not active'
+      );
+
+      await this.tokenController.setInvestorActive(aliceKey, true, { from: owner });
 
       await this.tokenController.migrateBalance(alice, newAlice, { from: owner });
 
       assert.equal(await this.mainToken.balanceOf(alice), ether(0));
       assert.equal(await this.mainToken.balanceOf(newAlice), ether(1000));
+
+      await this.tokenController.changeInvestorAddress(aliceKey, newAlice2, { from: owner });
+
+      assert.equal(await this.tokenController.isInvestorAddressActive(alice), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(newAlice), false);
+      assert.equal(await this.tokenController.isInvestorAddressActive(newAlice2), true);
+
+      await this.tokenController.migrateBalance(newAlice, newAlice2, { from: owner });
+
+      assert.equal(await this.mainToken.balanceOf(alice), ether(0));
+      assert.equal(await this.mainToken.balanceOf(newAlice), ether(0));
+      assert.equal(await this.mainToken.balanceOf(newAlice2), ether(1000));
     });
 
     it('pause and deactivate should work', async function() {

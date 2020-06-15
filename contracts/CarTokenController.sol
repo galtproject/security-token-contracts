@@ -16,7 +16,7 @@ import "./interfaces/ICarToken.sol";
 
 contract CarTokenController is Managed, Pausable {
 
-  ICarToken token;
+  ICarToken public token;
 
   struct Investor {
     address addr;
