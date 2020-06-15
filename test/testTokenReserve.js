@@ -189,7 +189,7 @@ describe('TokenReserve', () => {
       assert.equal(orderId.toString(), '1');
 
       await assertRevert(
-        this.tokenReserve.changeOrderReserve(orderId, ether(100), true, {from: owner}),
+        this.tokenReserve.changeOrderReserve(orderId, ether(100), true, { from: owner }),
         'Reserve changing available only for orders added by admins'
       );
 
@@ -265,11 +265,11 @@ describe('TokenReserve', () => {
       assert.equal(await this.tokenReserve.totalReserved(), ether(126));
 
       await assertRevert(
-        this.tokenReserve.changeOrderReserve(orderId, ether(100), true, {from: bob}),
+        this.tokenReserve.changeOrderReserve(orderId, ether(100), true, { from: bob }),
         'Administrated: Msg sender is not admin'
       );
 
-      await this.tokenReserve.changeOrderReserve(orderId, ether(100), true, {from: owner});
+      await this.tokenReserve.changeOrderReserve(orderId, ether(100), true, { from: owner });
 
       order = await this.tokenReserve.reservedOrders(orderId);
       assert.equal(order.reservedAmount, ether(142));
@@ -281,7 +281,7 @@ describe('TokenReserve', () => {
       assert.equal(await this.tokenReserve.currentReserved(), ether(184));
       assert.equal(await this.tokenReserve.totalReserved(), ether(226));
 
-      await this.tokenReserve.changeOrderReserve(orderId, ether(10), false, {from: owner});
+      await this.tokenReserve.changeOrderReserve(orderId, ether(10), false, { from: owner });
 
       order = await this.tokenReserve.reservedOrders(orderId);
       assert.equal(order.reservedAmount, ether(132));
@@ -295,7 +295,7 @@ describe('TokenReserve', () => {
 
       await assertRevert(
         this.tokenReserve.distributeReserve([alice], { from: dan }),
-        "SafeERC20: low-level call failed"
+        'SafeERC20: low-level call failed'
       );
 
       await this.tokenController.addNewInvestors([aliceKey], [alice], { from: dan });
