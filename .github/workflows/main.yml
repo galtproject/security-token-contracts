@@ -21,8 +21,8 @@ jobs:
         key: tests-node-${{ hashFiles('**/package-lock.json') }}
     - name: Run tests
       run: |
-        npm install
-        make lint && make compile && npm run test
+        yarn
+        make lint && make compile && yarn test
   coverage:
     runs-on: ubuntu-18.04
     steps:
@@ -36,5 +36,5 @@ jobs:
           key: coverage-node-${{ hashFiles('**/package-lock.json') }}
       - name: Run tests
         run: |
-          npm install
+          yarn
           make coverage
