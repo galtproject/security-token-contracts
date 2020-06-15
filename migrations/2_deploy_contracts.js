@@ -3,10 +3,16 @@ const web3Utils = require('web3-utils');
 const fs = require('fs');
 const path = require('path');
 
-const { deployWhitelistedTokenSale } = require('../helpers/deploy')(artifacts);
-
 module.exports = function(deployer, network, accounts) {
+  if (network === 'test' || network === 'soliditycoverage' || network === 'development') {
+    console.log('Skipping deployment migration');
+    return;
+  }
+
   deployer.then(async () => {
+    // eslint-disable-next-line global-require
+    const { deployWhitelistedTokenSale } = require('../helpers/deploy')(artifacts);
+
     const proxyAdmin = '0xE006A0BB078291e539B3c7b9c8A8aF7f29215600';
     const owner = '0xB844C65F3E161061bA5D5dD8497B3C04B71c4c83';
     const wallet = '0xB844C65F3E161061bA5D5dD8497B3C04B71c4c83';

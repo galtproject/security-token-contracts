@@ -1,6 +1,14 @@
+const { accountsConfig } = require('@openzeppelin/test-environment/lib/accounts');
 module.exports = {
-  skipFiles: [
-    'Migrations.sol',
-  ],
-  compileCommand: '../node_modules/.bin/truffle compile',
+  testrpcOptions: "-p 8555 -e 500000000 -a 35",
+  skipFiles: ['Migrations.sol', 'mocks'],
+  providerOptions: {
+    gasPrice: 1,
+    accounts: accountsConfig,
+  },
+  compileCommand: 'npm run compile',
+  testCommand: "npm run ttest",
+  mocha: {
+    timeout: 10000
+  }
 };
