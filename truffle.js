@@ -1,4 +1,3 @@
-const Ganache = require('ganache-core');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const web3 = require('web3');
 
@@ -11,6 +10,12 @@ function getProvider(rpc) {
 
 const config = {
   networks: {
+    soliditycoverage: {
+      host: '127.0.0.1',
+      port: 8555,
+      gasLimit: 9600000,
+      network_id: '*'
+    },
     local: {
       host: '127.0.0.1',
       port: 8545,
@@ -28,18 +33,17 @@ const config = {
     },
     test: {
       // https://github.com/trufflesuite/ganache-core#usage
-      provider: Ganache.provider({
-        unlocked_accounts: [0, 1, 2, 3, 4, 5],
-        total_accounts: 30,
-        debug: true,
-        vmErrorsOnRPCResponse: true,
-        default_balance_ether: 5000000,
-        // 7 800 000
-        gasLimit: 0x7704c0
-      }),
+      provider() {
+        // eslint-disable-next-line global-require
+        const { provider } = require('@openzeppelin/test-environment');
+        return provider;
+      },
       skipDryRun: true,
       network_id: '*'
     }
+  },
+  mocha: {
+    timeout: 10000
   },
   compilers: {
     solc: {
@@ -50,13 +54,10 @@ const config = {
           runs: 200
         }
       },
-      evmVersion: 'petersburg'
+      evmVersion: 'istanbul'
     }
-  }
+  },
+  plugins: ['solidity-coverage']
 };
-
-if (process.env.SOLIDITY_COVERAGE === 'yes') {
-  delete config.networks.test;
-}
 
 module.exports = config;

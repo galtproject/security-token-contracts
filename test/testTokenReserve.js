@@ -1,4 +1,6 @@
-const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
+const { accounts } = require('@openzeppelin/test-environment');
+// eslint-disable-next-line import/order
+const { contract } = require('./twrapper');
 const { assert } = require('chai');
 const _ = require('lodash');
 

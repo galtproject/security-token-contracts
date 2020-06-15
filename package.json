@@ -16,7 +16,7 @@
     "ganache-core": "2.8.0",
     "lodash": "^4.17.15",
     "mocha": "^7.0.1",
-    "solidity-coverage": "^0.6.7",
+    "solidity-coverage": "^0.7.5",
     "truffle": "5.1.2",
     "web3": "1.2.4"
   },
@@ -26,9 +26,10 @@
   "repository": "https://github.com/galtproject/whitelisted-crowdsale",
   "scripts": {
     "test": "mocha --exit --recursive test --timeout 10000",
+    "ttest": "truffle test --network test",
     "compile": "truffle compile",
     "deploy": "truffle migrate --network local",
-    "coverage": "SOLIDITY_COVERAGE=yes solidity-coverage",
+    "coverage": "SOLIDITY_COVERAGE=yes scripts/coverage.sh",
     "eslint": "eslint .",
     "eslint-fix": "eslint . --fix",
     "ethlint": "solium --dir contracts"
@@ -36,10 +37,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@galtproject/whitelisted-tokensale": "https://github.com/galtproject/whitelisted-tokensale#1403f33",
+    "@openzeppelin/contract-loader": "^0.6.1",
+    "@openzeppelin/contracts": "2.5.0",
     "@openzeppelin/contracts-ethereum-package": "^2.2.3",
     "@openzeppelin/upgrades": "^2.8.0",
-    "@openzeppelin/contracts": "2.5.0",
-    "@galtproject/whitelisted-tokensale": "https://github.com/galtproject/whitelisted-tokensale#1403f33",
     "p-iteration": "^1.1.8",
     "web3-utils": "^1.2.6"
   }
