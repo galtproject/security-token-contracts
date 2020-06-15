@@ -12,9 +12,10 @@ pragma solidity ^0.5.13;
 import "@galtproject/whitelisted-tokensale/contracts/traits/Pausable.sol";
 import "@galtproject/whitelisted-tokensale/contracts/traits/Managed.sol";
 import "./interfaces/ICarToken.sol";
+import "./interfaces/ICarTokenController.sol";
 
 
-contract CarTokenController is Managed, Pausable {
+contract CarTokenController is ICarTokenController, Managed, Pausable {
 
   ICarToken public token;
 
@@ -34,6 +35,8 @@ contract CarTokenController is Managed, Pausable {
 
   function setToken(ICarToken _token) external onlyOwner {
     token = _token;
+
+    emit SetToken(address(_token));
   }
 
   function addNewInvestors(bytes32[] calldata _keys, address[] calldata _addrs) external onlyAdminOrManager {
@@ -42,12 +45,16 @@ contract CarTokenController is Managed, Pausable {
 
     for (uint256 i = 0; i < len; i++) {
       _setInvestorAddress(_keys[i], _addrs[i]);
+
+      emit AddNewInvestor(_keys[i], _addrs[i]);
     }
   }
 
   function setInvestorActive(bytes32 _key, bool _active) external onlyAdminOrManager {
     require(investors[_key].addr != address(0), "Investor does not exists");
     investors[_key].active = _active;
+
+    emit SetInvestorActive(_key, _active);
   }
 
   function migrateBalance(address _from, address _to) public onlyAdmin {
@@ -80,6 +87,8 @@ contract CarTokenController is Managed, Pausable {
 
   function mintTokens(address _addr, uint256 _amount) external onlyAdmin {
     token.mint(_addr, _amount);
+
+    emit MintTokens(msg.sender, _addr, _amount);
   }
 
   function isInvestorAddressActive(address _addr) public view returns (bool) {
@@ -99,13 +108,20 @@ contract CarTokenController is Managed, Pausable {
     uint256 fromBalance = token.balanceOf(_from);
     token.burn(_from, fromBalance);
     token.mint(_to, fromBalance);
+
+    emit MigrateBalance(msg.sender, _from, _to);
   }
 
   function _changeInvestorAddress(bytes32 _investorKey, address _newAddr) internal {
+    address oldAddress = investors[_investorKey].addr;
+    require(oldAddress != _newAddr, "Old address and new address the same");
+
     keyOfInvestor[investors[_investorKey].addr] = bytes32(0);
     investors[_investorKey] = Investor(address(0), false);
 
     _setInvestorAddress(_investorKey, _newAddr);
+
+    emit ChangeInvestorAddress(msg.sender, _investorKey, oldAddress, _newAddr);
   }
 
   function _setInvestorAddress(bytes32 _key, address _addr) internal {
