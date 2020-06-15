@@ -169,17 +169,13 @@ describe('TokenController', () => {
 
       assert.equal(await this.tokenController.isInvestorAddressActive(newBob), false);
 
+      await assertRevert(this.tokenController.pause({ from: bob }), 'Msg sender is not admin');
+
       await this.tokenController.pause({ from: owner });
 
-      await assertRevert(
-        this.mainToken.transfer(alice, ether(10), { from: bob }),
-        'Pausable: paused'
-      );
+      await assertRevert(this.mainToken.transfer(alice, ether(10), { from: bob }), 'Pausable: paused');
 
-      await assertRevert(
-        this.tokenController.changeMyAddress(bobKey, newBob, { from: bob }),
-        'Pausable: paused'
-      );
+      await assertRevert(this.tokenController.changeMyAddress(bobKey, newBob, { from: bob }), 'Pausable: paused');
 
       await assertRevert(
         this.tokenController.changeMyAddressAndMigrateBalance(bobKey, newBob, { from: bob }),
