@@ -7,20 +7,20 @@
 
 <div align="center">
 
-![CI](https://github.com/galtproject/car-token-contracts/workflows/CI/badge.svg)
-<a href="https://codecov.io/gh/galtproject/car-token-contracts">
-  <img src="https://codecov.io/gh/galtproject/car-token-contracts/branch/develop/graph/badge.svg" />
+![CI](https://github.com/galtproject/security-token-contracts/workflows/CI/badge.svg)
+<a href="https://codecov.io/gh/galtproject/security-token-contracts">
+  <img src="https://codecov.io/gh/galtproject/security-token-contracts/branch/master/graph/badge.svg" />
 </a>
-<img src="https://img.shields.io/github/issues-raw/galtproject/car-token-contracts.svg?color=green&style=flat-square" alt="Opened issues"/>
-<img src="https://img.shields.io/github/issues-closed-raw/galtproject/car-token-contracts.svg?color=blue&style=flat-square" alt="Closed issues" />
-<img src="https://img.shields.io/github/issues-pr-closed/galtproject/car-token-contracts.svg?color=green&style=flat-square" alt="Closed PR"/>
-<img src="https://img.shields.io/github/issues-pr-raw/galtproject/car-token-contracts.svg?color=green&style=flat-square" alt="Opened PR"/>
+<img src="https://img.shields.io/github/issues-raw/galtproject/security-token-contracts.svg?color=green&style=flat-square" alt="Opened issues"/>
+<img src="https://img.shields.io/github/issues-closed-raw/galtproject/security-token-contracts.svg?color=blue&style=flat-square" alt="Closed issues" />
+<img src="https://img.shields.io/github/issues-pr-closed/galtproject/security-token-contracts.svg?color=green&style=flat-square" alt="Closed PR"/>
+<img src="https://img.shields.io/github/issues-pr-raw/galtproject/security-token-contracts.svg?color=green&style=flat-square" alt="Opened PR"/>
 <img src="https://img.shields.io/badge/version-1.0.0-yellow.svg" alt="Contracts Version"/>
 </div>
 <br/>
 <br/>
 <div align="center">
-  <img src="https://img.shields.io/github/contributors/galtproject/car-token-contracts?style=flat-square" alt="Сontributors" />
+  <img src="https://img.shields.io/github/contributors/galtproject/security-token-contracts?style=flat-square" alt="Сontributors" />
   <img src="https://img.shields.io/badge/contributions-welcome-orange.svg?style=flat-square" alt="Contributions Welcome" />
 </div>
 <br/>
@@ -30,14 +30,14 @@
 
 :page_with_curl: **Contracts developed by order of Curio Capital (CH) Limited (Company Number CHF-211.446.654) Incorporated and registered in Zug, Switzerland. For more information check the [Website](https://curioinvest.com/)**
 
-:construction: **[@security-token-contracts](https://github.com/galtproject/car-token-contracts/): Ethereum Mainnet**
+:construction: **[@security-token-contracts](https://github.com/galtproject/security-token-contracts/): Ethereum Mainnet**
 
-:bomb: **Security review status: Unaudited. At the moment, [@security-token-contracts](https://github.com/galtproject/car-token-contracts/) contracts are deployed on the Ethereum mainnet. Nonetheless it is still experimental software that has not yet been publicly audited. Use it on your own risk!****
+:bomb: **Security review status: Unaudited. At the moment, [@security-token-contracts](https://github.com/galtproject/security-token-contracts/) contracts are deployed on the Ethereum mainnet. Nonetheless it is still experimental software that has not yet been publicly audited. Use it on your own risk!****
 
-:memo:**Get started contributing with a good first [issue](https://github.com/galtproject/car-token-contracts/issues)**.
+:memo:**Get started contributing with a good first [issue](https://github.com/galtproject/security-token-contracts/issues)**.
 
 # Contracts overview
-This repository [@security-token-contracts](https://github.com/galtproject/car-token-contracts/) contains contracts:
+This repository [@security-token-contracts](https://github.com/galtproject/security-token-contracts/) contains contracts:
 - **CarToken.sol** - simple OpenZeppelin implementation of ERC20 token with 0 decimals;
 - **CarTokenController.sol** - a contract that allow add new investors or migrate addresses and balance of investors;
 - **TokenReserve.sol** - investment contract for exchanging ERC20 tokens to CarToken. It holds and reserve CarToken amounts inside contract until distribution;
