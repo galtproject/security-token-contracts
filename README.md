@@ -32,7 +32,7 @@
 
 :construction: **[@security-token-contracts](https://github.com/galtproject/car-token-contracts/): Ethereum Mainnet**
 
-:bomb: **Security review status: Unaudited. At the moment, [@security-token-contracts](https://github.com/galtproject/car-token-contracts/) contracts are deployed on the Ethereum mainnet. Nonetheless it is still experimental software that has not yet been publicly audited. Use it on your own risk!****
+:memo: **Security review status: Unaudited. At the moment, [@security-token-contracts](https://github.com/galtproject/car-token-contracts/) contracts are deployed on the Ethereum mainnet. Nonetheless it is still experimental software that has not yet been publicly audited. Use it on your own risk!****
 
 :memo:**Get started contributing with a good first [issue](https://github.com/galtproject/car-token-contracts/issues)**.
 
