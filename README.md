@@ -28,11 +28,11 @@
 ## Curio security tokens distribution
 **Contracts for safety investments and tokens holding. Using this contracts - investors can be sure that their funds will not be stolen or lost. Flexible logic of investments reserving allows all participants to make the deals off-chain or on-chain.**
 
-:page_with_curl: **For more information about investments check the [Website](https://curiocar.com/)**
+:page_with_curl: **Contracts developed by order of Curio Capital (CH) Limited (Company Number CHF-211.446.654) Incorporated and registered in Zug, Switzerland. For more information check the [Website](https://curioinvest.com/)**
 
-:construction: **@security-token-contracts stage: Mainnet**
+:construction: **[@security-token-contracts](https://github.com/galtproject/car-token-contracts/): Ethereum Mainnet**
 
-:bomb: **Security review status: Unaudited**
+:bomb: **Security review status: Unaudited. At the moment, [@security-token-contracts](https://github.com/galtproject/car-token-contracts/) contracts are deployed on the Ethereum mainnet. Nonetheless it is still experimental software that has not yet been publicly audited. Use it on your own risk!****
 
 :memo:**Get started contributing with a good first [issue](https://github.com/galtproject/car-token-contracts/issues)**.
 

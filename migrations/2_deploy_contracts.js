@@ -18,7 +18,7 @@ module.exports = function(deployer, network, accounts) {
   }
 
   deployer.then(async () => {
-    console.log('>>> Balance Before',  web3Utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether'));
+    console.log('>>> Balance Before', web3Utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether'));
 
     // eslint-disable-next-line global-require
     const { deployWhitelistedTokenSale } = require('../helpers/deploy')(artifacts);
@@ -106,7 +106,7 @@ module.exports = function(deployer, network, accounts) {
     //   accounts[0],
     //   web3Utils.toWei((10 ** 2).toString(), 'ether')
     // );
-    console.log('>>> Balance After',  web3Utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether'));
+    console.log('>>> Balance After', web3Utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether'));
 
     const contractsData = {
       mainTokenAddress: mainToken.address,
