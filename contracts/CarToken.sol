@@ -1,10 +1,9 @@
 /*
- * Copyright ©️ 2018-2020 Galt•Project Society Construction and Terraforming Company
- * (Founded by [Nikolai Popeka](https://github.com/npopeka)
+ * Copyright ©️ 2020 Curio AG (Company Number FL-0002.594.728-9)
+ * Incorporated and registered in Liechtenstein
  *
- * Copyright ©️ 2018-2020 Galt•Core Blockchain Company
- * (Founded by [Nikolai Popeka](https://github.com/npopeka) by
- * [Basic Agreement](ipfs/QmaCiXUmSrP16Gz8Jdzq6AJESY1EAANmmwha15uR3c1bsS)).
+ * Copyright ©️ 2020 Curio Capital AG (Company Number CHE-211.446.654)
+ * Incorporated and registered in Zug, Switzerland.
  */
 
 pragma solidity ^0.5.13;
