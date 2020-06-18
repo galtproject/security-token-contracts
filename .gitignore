@@ -4,6 +4,5 @@ node_modules
 coverage
 build
 .nyc_output
-deployed/*.json
 report/*.csv
 coverage.json
