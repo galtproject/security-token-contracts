@@ -39,7 +39,7 @@
   "dependencies": {
     "@galtproject/whitelisted-tokensale": "https://github.com/galtproject/whitelisted-tokensale#1403f33",
     "@openzeppelin/contract-loader": "^0.6.1",
-    "@openzeppelin/contracts": "2.5.0",
+    "@openzeppelin/contracts": "4.7.2",
     "@openzeppelin/contracts-ethereum-package": "^2.2.3",
     "@openzeppelin/upgrades": "^2.8.0",
     "p-iteration": "^1.1.8",
